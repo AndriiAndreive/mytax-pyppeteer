@@ -9,10 +9,6 @@ scrap_service_router = APIRouter()
 async def get_tax_status(account: Account):
     return await TaxController().get_status(account)
 
-@scrap_service_router.get(URI.TAXSTATUS.GET_ALL)
-async def get_root():
-    return 'Root'
-
 @scrap_service_router.get(URI.TAXSTATUS.GET_ICO)
 async def get_favicorn():
     return 'Favicorn'
