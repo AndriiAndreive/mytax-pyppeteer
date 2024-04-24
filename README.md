@@ -1,1 +1,3 @@
-### download chrome-driver from the below link: https://chromedriver.chromium.org/downloads
+# How to run on local
+### pip install -r requirements.txt
+### uvicorn main:app --reload
