@@ -12,7 +12,8 @@ class TaxController(BaseController):
         hasTimeout = False
         screenshot_path = 'taxstatus.png'
         # Launch the browser
-        browser = await launch(executablePath='./chrome-win/chrome.exe', headless=False)
+        browser = await launch(headless=False)
+        # browser = await launch(executablePath='./chrome-win/chrome.exe', headless=False)
         page = await browser.newPage()
         await page.setViewport({'width': 1920, 'height': 1080})
 
