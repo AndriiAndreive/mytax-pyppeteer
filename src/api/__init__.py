@@ -13,6 +13,6 @@ app = FastAPI(
     openapi_url="/openapi.json",                    # URL endpoint for the OpenAPI schema
 )
 
-api_prefix = "/api"
+api_prefix = ""
 
 app.include_router(router=scrap_service_router, prefix=api_prefix)
