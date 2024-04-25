@@ -9,7 +9,7 @@ import asyncio
 
 class TaxController(BaseController):
 
-    async def main(account):
+    async def main(self, account):
         hasSent = False
         hasTimeout = False
         screenshot_path = 'taxstatus.png'
