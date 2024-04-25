@@ -65,7 +65,9 @@ class TaxController(BaseController):
             return {"message": "An error occurred while sending screenshot via email."}
         
     def get_status(self, account: Account):
-        asyncio.get_event_loop().run_until_complete(self.main(account))
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self.main(account))
+        # asyncio.get_event_loop().run_until_complete(self.main(account))
         
 
     
