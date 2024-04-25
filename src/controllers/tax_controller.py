@@ -5,17 +5,18 @@ from src.payloads.account import Account
 from src.controllers import BaseController
 from src.helper.email_handler import EmailHandler
 import os
+import asyncio
 
 class TaxController(BaseController):
 
-    async def get_status(self, account: Account):
+    async def main(account):
         hasSent = False
         hasTimeout = False
         screenshot_path = 'taxstatus.png'
         # Launch the browser
-        # browser = await launch(headless=False)
+        browser = await launch(headless=True)
         os.chmod('./chrome-win/chrome.exe', 0o777)
-        browser = await launch(executablePath='./chrome-win/chrome.exe', headless=False)
+        # browser = await launch(executablePath='./chrome-win/chrome.exe', headless=False)
         page = await browser.newPage()
         await page.setViewport({'width': 1920, 'height': 1080})
 
@@ -62,5 +63,9 @@ class TaxController(BaseController):
             return {"message": "You has been sent the email successfully."}        
         else:
             return {"message": "An error occurred while sending screenshot via email."}
+        
+    async def get_status(self, account: Account):
+        asyncio.get_event_loop().run_until_complete(self.main(account))
+        
 
     
