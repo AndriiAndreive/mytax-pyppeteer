@@ -21,3 +21,5 @@ urllib3==1.26.18
 uvicorn==0.29.0
 websockets==10.4
 zipp==3.18.1
+chromedriver_py==91.0.4472.101
+
