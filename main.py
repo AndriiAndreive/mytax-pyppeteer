@@ -9,7 +9,15 @@ from fastapi import FastAPI
 from dotenv import load_dotenv
 load_dotenv('.env')
 
-app = FastAPI()
+# app = FastAPI()
+app = FastAPI(
+    title="MyTax APIs",                             # Title for your API documentation
+    description="API to get tax status",            # Description for your API documentation
+    version="1.0",                                  # Version of your API
+    # docs_url="/",                                   # URL endpoint for the Swagger UI
+    redoc_url="/redoc",                             # URL endpoint for the ReDoc UI
+    openapi_url="/openapi.json",                    # URL endpoint for the OpenAPI schema
+)
 
 @app.get("/")
 async def root():
@@ -19,15 +27,8 @@ async def root():
 async def get_favicorn():
     return {"message": "This is favicorn"}
 
-
 @app.post("/taxt-status")
-async def get_status(self, account: Account):
-    # loop = asyncio.get_event_loop()
-    # loop.run_until_complete(self.main(account))
-    await asyncio.sleep(1)
-    return asyncio.get_event_loop().run_until_complete(self.main(account))
-
-async def main(self, account):
+async def get_status(account: Account):
     hasSent = False
     hasTimeout = False
     screenshot_path = 'taxstatus.png'
