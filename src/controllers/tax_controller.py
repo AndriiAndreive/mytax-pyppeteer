@@ -64,10 +64,11 @@ class TaxController(BaseController):
         else:
             return {"message": "An error occurred while sending screenshot via email."}
         
-    def get_status(self, account: Account):
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(self.main(account))
-        # asyncio.get_event_loop().run_until_complete(self.main(account))
+    async def get_status(self, account: Account):
+        # loop = asyncio.get_event_loop()
+        # loop.run_until_complete(self.main(account))
+        await asyncio.sleep(1)
+        await asyncio.get_event_loop().run_until_complete(self.main(account))
         
 
     
