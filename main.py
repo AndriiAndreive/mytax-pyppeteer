@@ -9,15 +9,15 @@ from fastapi import FastAPI
 from dotenv import load_dotenv
 load_dotenv('.env')
 
-# app = FastAPI()
-app = FastAPI(
-    title="MyTax APIs",                             # Title for your API documentation
-    description="API to get tax status",            # Description for your API documentation
-    version="1.0",                                  # Version of your API
-    # docs_url="/",                                   # URL endpoint for the Swagger UI
-    redoc_url="/redoc",                             # URL endpoint for the ReDoc UI
-    openapi_url="/openapi.json",                    # URL endpoint for the OpenAPI schema
-)
+app = FastAPI()
+# app = FastAPI(
+#     title="MyTax APIs",                             # Title for your API documentation
+#     description="API to get tax status",            # Description for your API documentation
+#     version="1.0",                                  # Version of your API
+#     # docs_url="/",                                   # URL endpoint for the Swagger UI
+#     redoc_url="/redoc",                             # URL endpoint for the ReDoc UI
+#     openapi_url="/openapi.json",                    # URL endpoint for the OpenAPI schema
+# )
 
 @app.get("/")
 async def root():
