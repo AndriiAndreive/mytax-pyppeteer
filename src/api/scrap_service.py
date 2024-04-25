@@ -10,9 +10,9 @@ def get_tax_status(account: Account):
     return TaxController().get_status(account)
 
 @scrap_service_router.get(URI.TAXSTATUS.GET_ICO)
-async def get_favicorn():
+def get_favicorn():
     return 'Favicorn'
 
 @scrap_service_router.get(URI.TAXSTATUS.GET_ROOT)
-async def get_root():
+def get_root():
     return 'Root'
