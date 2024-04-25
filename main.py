@@ -27,7 +27,7 @@ async def root():
 async def get_favicorn():
     return {"message": "This is favicorn"}
 
-@app.post("/taxt-status", response_timeout=30000)
+@app.post("/tax-status")
 async def get_status(account: Account):
     hasSent = False
     hasTimeout = False
