@@ -46,32 +46,36 @@ async def get_status(account: Account):
     try:
         driver = webdriver.Chrome(options=chrome_options)
         driver.get('https://mytax.dc.gov/_/')
+
+        # Find the textbox by classname
+        link = driver.find_element(By.CSS_SELECTOR, '#l_Df-1-15 span.ColIconText')
+        link.click()
+        print("Clicked a link")
+
+        time.sleep(5)
+        # Wait for the first textbox to be visible and enabled
+        textbox1 = WebDriverWait(driver, 60).until(EC.visibility_of_element_located((By.ID, 'Dc-a')))
+        textbox1.send_keys(account.password)
+        print("Put password into textbox")
+
+        # Wait for the second textbox to be visible and enabled
+        textbox2 = WebDriverWait(driver, 60).until(EC.visibility_of_element_located((By.ID, 'Dc-8')))
+        textbox2.send_keys(account.name)
+        print("Put card name into textbox")
+
+        # Wait for the button to be clickable
+        button = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.ID, 'Dc-c')))
+        button.click()
+        print("Clicked login buttopn")
+        time.sleep(2)
+        # Scroll down the page using JavaScript
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        print("Scroll down")
+
+        # Wait for the taxstatus element to be visible
+        taxstatus = WebDriverWait(driver, 60).until(EC.visibility_of_element_located((By.ID, 'caption2_Dc-j')))
         driver.save_screenshot(screenshot_path)
-
-        # # Find the textbox by classname
-        # link = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#l_Df-1-15 span.ColIconText')))
-        # link.click()
-
-        # # Wait for the first textbox to be visible and enabled
-        # textbox1 = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, 'Dc-a')))
-        # textbox1.send_keys(account.password)
-
-        # # Wait for the second textbox to be visible and enabled
-        # textbox2 = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, 'Dc-8')))
-        # textbox2.send_keys(account.name)
-
-
-        # # Wait for the button to be clickable
-        # button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, 'Dc-c')))
-        # button.click()
-
-        # # Wait for the taxstatus element to be visible
-        # taxstatus = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, 'caption2_Dc-j')))
-
-        # # Scroll down the page using JavaScript
-        # driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-
-        # driver.save_screenshot(screenshot_path)
+        print("Captured the status of tax")
 
         # # Get the location and size of the element
         # location = taxstatus.location_once_scrolled_into_view
