@@ -46,6 +46,13 @@ async def get_status(account: Account):
     try:
         driver = webdriver.Chrome(options=chrome_options)
         driver.get('https://mytax.dc.gov/_/')
+        
+        driver.save_screenshot(screenshot_path)
+        hasSent = await EmailHandler().send_email(account.email, screenshot_path) 
+        if hasSent == True:
+            return {"message": "You has been sent the email successfully."}
+        else:
+            return {"message": "An error occurred while sending email"}
 
         # Find the textbox by classname
         link = driver.find_element(By.CSS_SELECTOR, '#l_Df-1-15 span.ColIconText')
