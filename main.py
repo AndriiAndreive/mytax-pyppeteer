@@ -45,17 +45,28 @@ async def get_status(account: Account):
     screenshot_path = 'taxstatus.png'
 
     driver = webdriver.Chrome(options=chrome_options)
-    driver.get('https://mytax.dc.gov/_/')
-    time.sleep(4)
 
-    try:
-        # Try to find and click the initial link
-        link = driver.find_element(By.CSS_SELECTOR, '#l_Df-1-15 span.ColIconText')
-        link.click()
-    except NoSuchElementException:
-        # If initial link not found, select another element
-        linkButton = driver.find_element(By.CSS_SELECTOR, 'a.SessionMessageButton')
-        linkButton.click()
+    max_attempts = 3  # Maximum number of attempts to find the link
+    attempts = 0
+    while attempts < max_attempts:
+        try:
+            # Try to find and click the initial link
+            driver.get('https://mytax.dc.gov/_/')
+            time.sleep(4)
+            link = driver.find_element(By.CSS_SELECTOR, '#l_Df-1-15 span.ColIconText')
+            link.click()
+        except NoSuchElementException:
+            print(f"Attempt {attempts + 1}: Link not found, retrying...")
+            attempts += 1
+            # If initial link not found, select another element
+            # linkButton = driver.find_element(By.CSS_SELECTOR, 'a.SessionMessageButton')
+            # linkButton.click()
+
+    if attempts == max_attempts:
+        print("Link not found after maximum attempts.")
+    else:
+        print("Link found and clicked successfully.")
+
     time.sleep(1)
     try:
         # Find the textbox by classname
