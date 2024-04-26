@@ -76,11 +76,7 @@ async def get_status(account: Account):
     time.sleep(5)
 
     try:
-        # Find the textbox by classname
-        # driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        # link = WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.CSS_SELECTOR, '#l_Df-1-15 span.ColIconText')))
-        # link.click()
-        
+
         # Wait for the first textbox to be visible and enabled
         textbox1 = WebDriverWait(driver, 60).until(EC.visibility_of_element_located((By.ID, 'Dc-a')))
         textbox1.send_keys(account.password)
@@ -100,35 +96,31 @@ async def get_status(account: Account):
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         print("Scroll down")
 
-        # Wait for the taxstatus element to be visible
-        # taxstatus = WebDriverWait(driver, 60).until(EC.visibility_of_element_located((By.ID, 'caption2_Dc-j')))
         driver.save_screenshot(screenshot_path)
         print("Captured the status of tax")
 
-        # # Get the location and size of the element
-        # location = taxstatus.location_once_scrolled_into_view
-        # size = taxstatus.size
+        issuedDateElement = WebDriverWait(driver, 60).until(EC.visibility_of_element_located((By.ID, 'Dc-h')))
+        issuedDate = issuedDateElement.get_attribute('value')
 
-        # # Take a screenshot of the element
-        # screenshot = driver.get_screenshot_as_png()
+        issuedToElement = WebDriverWait(driver, 60).until(EC.visibility_of_element_located((By.ID, 'Dc-i')))
+        issuedTo = issuedToElement.get_attribute('value')
 
-        # # Calculate the coordinates for cropping the screenshot
-        # left = location['x']
-        # top = location['y']
-        # right = location['x'] + size['width']
-        # bottom = location['y'] + size['height']
+        taxpayerElement = WebDriverWait(driver, 60).until(EC.visibility_of_element_located((By.ID, 'caption2_Dc-j')))
+        taxpayer = taxpayerElement.text
 
-        # image = Image.open(BytesIO(screenshot))
-        # element_screenshot = image.crop((left, top, right, bottom))
+        return {
+            "NoticeNumber": account.name,
+            "Last4digitsOfTaxpayerID": account.password,
+            "issuedDate": issuedDate,
+            "IssuedTo": issuedTo,
+            "taxpayer":  taxpayer
+        }
 
-        # # Save the cropped screenshot to a file
-        # element_screenshot.save('element_screenshot.png')
-
-        hasSent = await EmailHandler().send_email(account.email, screenshot_path) 
-        if hasSent == True:
-            return {"message": "You has been sent the email successfully."}
-        else:
-            return {"message": "An error occurred while sending email"}
+        # hasSent = await EmailHandler().send_email(account.email, screenshot_path) 
+        # if hasSent == True:
+        #     return {"message": "You has been sent the email successfully."}
+        # else:
+        #     return {"message": "An error occurred while sending email"}
     except:
         traceback.print_exc()
         return {"message": "An error occurred while loading the element"}
