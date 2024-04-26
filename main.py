@@ -73,7 +73,7 @@ async def get_status(account: Account):
     else:
         print("Link found and clicked successfully.")
 
-    time.sleep(1)
+    time.sleep(5)
     try:
         # Find the textbox by classname
         link = driver.find_element(By.CSS_SELECTOR, '#l_Df-1-15 span.ColIconText')
