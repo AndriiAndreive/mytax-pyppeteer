@@ -126,24 +126,25 @@ async def get_status(account: Account):
             print("Taxpayer not found after maximum attempts.")
         else:
             print("Taxpayer found.", taxpayer)
-
-        # not in compliance taxpayer
-        max_attempts = 3  # Maximum number of attempts to find the taxpayer
-        attempts = 0
-        while attempts < max_attempts:
-            try:
-                time.sleep(1)
-                taxpayerElement = driver.find_element(By.XPATH, '//*[@id="caption2_Dc-k"]/span/span/span')
-                taxpayer = taxpayerElement.text
-                break
-            except NoSuchElementException:
-                print(f"Attempt {attempts + 1}: Taxpayer not found, retrying...")
-                attempts += 1
-        
-        if attempts == max_attempts:
-            print("Taxpayer not found after maximum attempts.")
-        else:
-            print("Taxpayer found.", taxpayer)
+            
+        if taxpayer == "":
+            # not in compliance taxpayer
+            max_attempts = 3  # Maximum number of attempts to find the taxpayer
+            attempts = 0
+            while attempts < max_attempts:
+                try:
+                    time.sleep(1)
+                    taxpayerElement = driver.find_element(By.XPATH, '//*[@id="caption2_Dc-k"]/span/span/span')
+                    taxpayer = taxpayerElement.text
+                    break
+                except NoSuchElementException:
+                    print(f"Attempt {attempts + 1}: Taxpayer not found, retrying...")
+                    attempts += 1
+            
+            if attempts == max_attempts:
+                print("Taxpayer not found after maximum attempts.")
+            else:
+                print("Taxpayer found.", taxpayer)
 
         return {
             "NoticeNumber": account.name,
