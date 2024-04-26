@@ -113,14 +113,16 @@ async def get_status(account: Account):
         taxpayer = ""
         while attempts < max_attempts:
             try:
-                time.sleep(2)
+                time.sleep(1)
                 taxpayerElement = driver.find_element(By.XPATH, '//*[@id="caption2_Dc-j"]/span/span/span')
+                print(taxpayerElement)
                 taxpayer = taxpayerElement.text
+                print(taxpayer)
                 break
             except NoSuchElementException:
                 print(f"Attempt {attempts + 1}: Taxpayer not found, retrying...")
                 attempts += 1
-
+        print(attempts, max_attempts)
         if attempts == max_attempts:
             print("Taxpayer not found after maximum attempts.")
         else:
