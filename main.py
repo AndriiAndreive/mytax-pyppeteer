@@ -109,7 +109,7 @@ async def get_status(account: Account):
         issuedTo = issuedToElement.get_attribute('value')
         print("Got issued To: ", issuedTo)
 
-        taxpayerElement = WebDriverWait(driver, 60).until(EC.visibility_of_element_located((By.ID, 'caption2_Dc-j')))
+        taxpayerElement = WebDriverWait(driver, 60).until(EC.visibility_of_element_located((By.ID, 'Dc-j')))
         taxpayer = taxpayerElement.text
         print("Got taxpayer status: ", taxpayer)
 
