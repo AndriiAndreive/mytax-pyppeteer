@@ -73,7 +73,7 @@ async def get_status(account: Account):
         print("Scroll down")
 
         # Wait for the taxstatus element to be visible
-        taxstatus = WebDriverWait(driver, 60).until(EC.visibility_of_element_located((By.ID, 'caption2_Dc-j')))
+        # taxstatus = WebDriverWait(driver, 60).until(EC.visibility_of_element_located((By.ID, 'caption2_Dc-j')))
         driver.save_screenshot(screenshot_path)
         print("Captured the status of tax")
 
