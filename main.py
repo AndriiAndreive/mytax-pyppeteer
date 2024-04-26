@@ -66,7 +66,7 @@ async def get_status(account: Account):
         # Wait for the button to be clickable
         button = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.ID, 'Dc-c')))
         button.click()
-        print("Clicked login buttopn")
+        print("Clicked login button")
         time.sleep(2)
         # Scroll down the page using JavaScript
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
