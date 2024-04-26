@@ -12,6 +12,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException
 from email_handler import EmailHandler
 import traceback
 import os
@@ -42,24 +43,27 @@ async def get_status(account: Account):
     chrome_options.add_argument("--window-size=1920,1080")
     chrome_options.add_argument("--remote-debugging-port=9222")
     screenshot_path = 'taxstatus.png'
-    
-    try:
-        driver = webdriver.Chrome(options=chrome_options)
-        driver.get('https://mytax.dc.gov/_/')
-        time.sleep(5)
-        driver.save_screenshot(screenshot_path)
-        hasSent = await EmailHandler().send_email(account.email, screenshot_path) 
-        if hasSent == True:
-            return {"message": "You has been sent the email successfully."}
-        else:
-            return {"message": "An error occurred while sending email"}
 
+    driver = webdriver.Chrome(options=chrome_options)
+    driver.get('https://mytax.dc.gov/_/')
+    time.sleep(4)
+
+    try:
+        # Try to find and click the initial link
+        link = driver.find_element(By.CSS_SELECTOR, '#l_Df-1-15 span.ColIconText')
+        link.click()
+    except NoSuchElementException:
+        # If initial link not found, select another element
+        linkButton = driver.find_element(By.CSS_SELECTOR, 'a.SessionMessageButton')
+        linkButton.click()
+    time.sleep(1)
+    try:
         # Find the textbox by classname
         link = driver.find_element(By.CSS_SELECTOR, '#l_Df-1-15 span.ColIconText')
         link.click()
         print("Clicked a link")
 
-        time.sleep(5)
+        time.sleep(3)
         # Wait for the first textbox to be visible and enabled
         textbox1 = WebDriverWait(driver, 60).until(EC.visibility_of_element_located((By.ID, 'Dc-a')))
         textbox1.send_keys(account.password)
@@ -74,7 +78,7 @@ async def get_status(account: Account):
         button = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.ID, 'Dc-c')))
         button.click()
         print("Clicked login button")
-        time.sleep(2)
+        time.sleep(1)
         # Scroll down the page using JavaScript
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         print("Scroll down")
