@@ -30,16 +30,25 @@ class EmailHandler:
         # Attach text message
         text = MIMEText('Screenshot of tax status.')
         msg.attach(text)
+        print('Image data is:')
+        print(msg)
+        print('Created a message template')
 
         try:
+            print('Connecting...')
+            print(self.smtp_server, self.smtp_port)
+            print('Connecting...')
             server = smtplib.SMTP(self.smtp_server, self.smtp_port)
-            print('ok1')
+            print('Connected...')
             print(self.smtp_username, self.smtp_password)
+            print('Logining...')
             server.login(self.smtp_username, self.smtp_password)
-            print('ok2')
+            print('Logged in smtp server.')
             server.send_message(msg)
-            print('ok3')
+            print('Message sent!')
+            print('Closing smtp server client...')
             server.quit()
+            print('Closed!')
             return True
         
         except Exception as e:
