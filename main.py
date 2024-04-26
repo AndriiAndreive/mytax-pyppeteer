@@ -55,6 +55,7 @@ async def get_status(account: Account):
             time.sleep(4)
             link = driver.find_element(By.CSS_SELECTOR, '#l_Df-1-15 span.ColIconText')
             link.click()
+            break
         except NoSuchElementException:
             print(f"Attempt {attempts + 1}: Link not found, retrying...")
             attempts += 1
