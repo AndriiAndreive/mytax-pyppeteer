@@ -109,9 +109,23 @@ async def get_status(account: Account):
         issuedTo = issuedToElement.get_attribute('value')
         print("Got issued To: ", issuedTo)
 
-        taxpayerElement = WebDriverWait(driver, 60).until(EC.visibility_of_element_located((By.ID, 'fc_Dc-j')))
-        taxpayer = taxpayerElement.text
-        print("Got taxpayer status: ", taxpayer)
+        max_attempts = 3  # Maximum number of attempts to find the taxpayer
+        attempts = 0
+        taxpayer = ""
+        while attempts < max_attempts:
+            try:
+                time.sleep(2)
+                taxpayerElement = driver.find_element(By.XPATH, '//*[@id="caption2_Dc-j"]/span/span/span')
+                taxpayer = taxpayerElement.text
+                break
+            except NoSuchElementException:
+                print(f"Attempt {attempts + 1}: Taxpayer not found, retrying...")
+                attempts += 1
+
+        if attempts == max_attempts:
+            print("Taxpayer not found after maximum attempts.")
+        else:
+            print("Taxpayer found.")
 
         return {
             "NoticeNumber": account.name,
