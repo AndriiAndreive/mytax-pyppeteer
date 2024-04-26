@@ -34,8 +34,11 @@ class EmailHandler:
         print('ok')
         try:
             server = smtplib.SMTP(self.smtp_server, self.smtp_port)
+            print('ok1')
             server.login(self.smtp_username, self.smtp_password)
+            print('ok2')
             server.send_message(msg)
+            print('ok3')
             server.quit()
             return True
         
