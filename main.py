@@ -108,6 +108,7 @@ async def get_status(account: Account):
         issuedTo = issuedToElement.get_attribute('value')
         print("Got issued To: ", issuedTo)
 
+        # compliance taxpayer.
         max_attempts = 3  # Maximum number of attempts to find the taxpayer
         attempts = 0
         taxpayer = ""
@@ -115,14 +116,30 @@ async def get_status(account: Account):
             try:
                 time.sleep(1)
                 taxpayerElement = driver.find_element(By.XPATH, '//*[@id="caption2_Dc-j"]/span/span/span')
-                print(taxpayerElement)
                 taxpayer = taxpayerElement.text
-                print(taxpayer)
                 break
             except NoSuchElementException:
                 print(f"Attempt {attempts + 1}: Taxpayer not found, retrying...")
                 attempts += 1
-        print(attempts, max_attempts)
+        
+        if attempts == max_attempts:
+            print("Taxpayer not found after maximum attempts.")
+        else:
+            print("Taxpayer found.", taxpayer)
+
+        # not in compliance taxpayer
+        max_attempts = 3  # Maximum number of attempts to find the taxpayer
+        attempts = 0
+        while attempts < max_attempts:
+            try:
+                time.sleep(1)
+                taxpayerElement = driver.find_element(By.XPATH, '//*[@id="caption2_Dc-k"]/span/span/span')
+                taxpayer = taxpayerElement.text
+                break
+            except NoSuchElementException:
+                print(f"Attempt {attempts + 1}: Taxpayer not found, retrying...")
+                attempts += 1
+        
         if attempts == max_attempts:
             print("Taxpayer not found after maximum attempts.")
         else:
@@ -131,9 +148,9 @@ async def get_status(account: Account):
         return {
             "NoticeNumber": account.name,
             "Last4digitsOfTaxpayerID": account.password,
-            "issuedDate": issuedDate,
+            "IssuedDate": issuedDate,
             "IssuedTo": issuedTo,
-            "taxpayer":  taxpayer
+            "Taxpayer":  taxpayer
         }
 
         # hasSent = await EmailHandler().send_email(account.email, screenshot_path) 
