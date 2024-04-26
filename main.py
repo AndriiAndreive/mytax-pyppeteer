@@ -45,23 +45,28 @@ async def get_status(account: Account):
     screenshot_path = 'taxstatus.png'
 
     driver = webdriver.Chrome(options=chrome_options)
+    driver.get('https://mytax.dc.gov/_/')
+
+    try:
+        linkButton = driver.find_element(By.CSS_SELECTOR, 'a.SessionMessageButton')
+        linkButton.click()
+        time.sleep(3)
+    except NoSuchElementException:
+        print('Session has not expired yet')
 
     max_attempts = 3  # Maximum number of attempts to find the link
     attempts = 0
     while attempts < max_attempts:
         try:
             # Try to find and click the initial link
-            driver.get('https://mytax.dc.gov/_/')
-            time.sleep(4)
+            time.sleep(2)
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             link = driver.find_element(By.CSS_SELECTOR, '#l_Df-1-15 span.ColIconText')
             link.click()
             break
         except NoSuchElementException:
             print(f"Attempt {attempts + 1}: Link not found, retrying...")
             attempts += 1
-            # If initial link not found, select another element
-            # linkButton = driver.find_element(By.CSS_SELECTOR, 'a.SessionMessageButton')
-            # linkButton.click()
 
     if attempts == max_attempts:
         print("Link not found after maximum attempts.")
