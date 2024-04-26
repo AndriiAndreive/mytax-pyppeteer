@@ -19,7 +19,7 @@ import os
 load_dotenv('.env')
 
 class Account(BaseModel):
-    email: str = Field(..., description="recipient email")
+    # email: str = Field(..., description="recipient email")
     name: str = Field(..., description="mytax name")
     password: str = Field(..., description="mytax password")
 
@@ -126,7 +126,7 @@ async def get_status(account: Account):
             print("Taxpayer not found after maximum attempts.")
         else:
             print("Taxpayer found.", taxpayer)
-            
+
         if taxpayer == "":
             # not in compliance taxpayer
             max_attempts = 3  # Maximum number of attempts to find the taxpayer
