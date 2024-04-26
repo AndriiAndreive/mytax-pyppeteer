@@ -2,6 +2,3 @@ chrome-win
 .env
 node-modules
 venv
-*.csv
-*.png
-*.jpg

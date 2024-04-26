@@ -14,6 +14,8 @@ from email_handler import EmailHandler
 import traceback
 import os
 load_dotenv('.env')
+os.chmod('./element_screenshot.png', 0o755)
+os.chmod('./screenshot.png', 0o755)
 
 class Account(BaseModel):
     email: str = Field(..., description="recipient email")
@@ -39,7 +41,7 @@ async def get_status(account: Account):
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920,1080")
     chrome_options.add_argument("--remote-debugging-port=9222")
-    
+
     try:
         driver = webdriver.Chrome(options=chrome_options)
         driver.get('https://sandbox.oxylabs.io/products')
