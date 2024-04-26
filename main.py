@@ -54,31 +54,11 @@ async def get_status(account: Account):
     except NoSuchElementException:
         print('Session has not expired yet')
 
-    max_attempts = 3  # Maximum number of attempts to find the link
-    attempts = 0
-    while attempts < max_attempts:
-        try:
-            # Try to find and click the initial link
-            time.sleep(2)
-            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            link = driver.find_element(By.CSS_SELECTOR, '#l_Df-1-15 span.ColIconText')
-            link.click()
-            break
-        except NoSuchElementException:
-            print(f"Attempt {attempts + 1}: Link not found, retrying...")
-            attempts += 1
-
-    if attempts == max_attempts:
-        print("Link not found after maximum attempts.")
-    else:
-        print("Link found and clicked successfully.")
-
-    time.sleep(5)
     try:
         # Find the textbox by classname
-        link = driver.find_element(By.CSS_SELECTOR, '#l_Df-1-15 span.ColIconText')
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        link = WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.CSS_SELECTOR, '#l_Df-1-15 span.ColIconText')))
         link.click()
-        print("Clicked a link")
 
         time.sleep(3)
         # Wait for the first textbox to be visible and enabled
