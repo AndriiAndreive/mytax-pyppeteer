@@ -25,16 +25,16 @@ class EmailHandler:
         # Attach screenshot
         with open(screenshot_path, 'rb') as fp:
             img = MIMEImage(fp.read())
-            print(img)
             msg.attach(img)
 
         # Attach text message
         text = MIMEText('Screenshot of tax status.')
         msg.attach(text)
-        print('ok')
+
         try:
             server = smtplib.SMTP(self.smtp_server, self.smtp_port)
             print('ok1')
+            print(self.smtp_username, self.smtp_password)
             server.login(self.smtp_username, self.smtp_password)
             print('ok2')
             server.send_message(msg)
