@@ -28,7 +28,7 @@ app = FastAPI()
 async def root():
     return {"message": "Hello World"}
 
-@app.get("/favicorn.ico")
+@app.get("/favicon.ico")
 async def get_favicorn():
     return {"message": "This is favicorn"}
 
