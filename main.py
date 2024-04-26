@@ -99,7 +99,6 @@ async def get_status(account: Account):
         driver.save_screenshot(screenshot_path)
         print("Captured the status of tax")
 
-        time.sleep(6)
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         issuedDateElement = WebDriverWait(driver, 60).until(EC.visibility_of_element_located((By.ID, 'Dc-h')))
         issuedDate = issuedDateElement.get_attribute('value')
@@ -125,7 +124,7 @@ async def get_status(account: Account):
         if attempts == max_attempts:
             print("Taxpayer not found after maximum attempts.")
         else:
-            print("Taxpayer found.")
+            print("Taxpayer found.", taxpayer)
 
         return {
             "NoticeNumber": account.name,
