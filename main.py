@@ -1,23 +1,26 @@
 import os
 import time
 import asyncio
-from pyppeteer import launch
-from pyppeteer.errors import TimeoutError
-from src.payloads.account import Account
-from src.helper.email_handler import EmailHandler
 from fastapi import FastAPI
 from dotenv import load_dotenv
+from pydantic import Field, BaseModel
+from PIL import Image
+from io import BytesIO
+import pandas as pd
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from email_handler import EmailHandler
+
 load_dotenv('.env')
 
+class Account(BaseModel):
+    email: str = Field(..., description="recipient email")
+    name: str = Field(..., description="mytax name")
+    password: str = Field(..., description="mytax password")
+
 app = FastAPI()
-# app = FastAPI(
-#     title="MyTax APIs",                             # Title for your API documentation
-#     description="API to get tax status",            # Description for your API documentation
-#     version="1.0",                                  # Version of your API
-#     # docs_url="/",                                   # URL endpoint for the Swagger UI
-#     redoc_url="/redoc",                             # URL endpoint for the ReDoc UI
-#     openapi_url="/openapi.json",                    # URL endpoint for the OpenAPI schema
-# )
 
 @app.get("/")
 async def root():
@@ -29,59 +32,59 @@ async def get_favicorn():
 
 @app.post("/tax-status")
 async def get_status(account: Account):
-    hasSent = False
-    hasTimeout = False
-    screenshot_path = 'taxstatus.png'
-    # Launch the browser
-    browser = await launch(headless=True)
-    # os.chmod('./chrome-win/chrome.exe', 0o777)
-    # browser = await launch(executablePath='./chrome-win/chrome.exe', headless=False)
-    page = await browser.newPage()
-    await page.setViewport({'width': 1920, 'height': 1080})
+    print(account.email)
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--window-size=1920,1080")
 
-    try:
-        # Navigate to the website
-        await page.goto('https://mytax.dc.gov/_/')
+    driver = webdriver.Chrome(options=chrome_options)
+    driver.get('https://sandbox.oxylabs.io/products')
+    driver.save_screenshot('screenshot.png')
 
-        # Wait for the page to load
-        await page.waitForSelector('#l_Df-1-15 span.ColIconText')
+    # Find the textbox by classname
+    textbox = driver.find_element(By.CLASS_NAME, 'egbpcqk1')
 
-        # Click the span containing the specified text
-        await page.click('#l_Df-1-15 span.ColIconText')
-        
-        # Input data
-        # Input "hello" into the input box with id "Dc-a"
-        await page.waitForSelector('#Dc-8')
-        time.sleep(1)
-        await page.waitForSelector('#Dc-a')
-        await page.type('#Dc-a', account.password)
-        await page.type('#Dc-8', account.name)
+    # Input text "Cloudth" into the textbox
+    textbox.send_keys("Tetris Effect: Connected")
 
-        # Click the validate button
-        await page.click('button#Dc-c')
 
-        # Wait for the search result element to load
-        await page.waitForSelector('#caption2_Dc-j')
-        
-        time.sleep(10)
-        # Capture screenshot
-        await page.screenshot({'path': screenshot_path})
+    # Find the image by classname
+    image = driver.find_element(By.CLASS_NAME, 'egbpcqk0')
 
-        # Send email
-        hasSent = await EmailHandler().send_email(account.email, screenshot_path) 
+    # Click on the image
+    image.click()
 
-    except TimeoutError:
-        hasTimeout = True
-    
-    finally:
-        await browser.close()
-    
-    if hasTimeout is True:
-        return {"message": "Timeout error occurred."}
-    elif hasSent is True:
-        return {"message": "You has been sent the email successfully."}        
+    time.sleep(3)
+
+    # Scroll down the page using JavaScript
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
+    driver.save_screenshot('screenshot.png')
+
+    # Find the element you want to capture (replace 'element_id' with the actual ID, class name, XPath, etc.)
+    element = driver.find_element(By.CLASS_NAME, 'e1kord973')
+
+    # Get the location and size of the element
+    location = element.location_once_scrolled_into_view
+    size = element.size
+
+    # Take a screenshot of the element
+    screenshot = driver.get_screenshot_as_png()
+
+    # Calculate the coordinates for cropping the screenshot
+    left = location['x']
+    top = location['y']
+    right = location['x'] + size['width']
+    bottom = location['y'] + size['height']
+
+    image = Image.open(BytesIO(screenshot))
+    element_screenshot = image.crop((left, top, right, bottom))
+
+    # Save the cropped screenshot to a file
+    element_screenshot.save('element_screenshot.png')
+
+    hasSent = await EmailHandler().send_email(account.email, 'element_screenshot.png') 
+    if hasSent == True:
+        return {"message": "You has been sent the email successfully."}
     else:
-        return {"message": "An error occurred while sending screenshot via email."}
-
-    
-
+        return {"message": "An error occurred while sending email"}
