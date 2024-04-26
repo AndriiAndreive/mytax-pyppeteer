@@ -1,4 +1,3 @@
-import os
 import time
 import asyncio
 from fastapi import FastAPI
@@ -12,7 +11,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from email_handler import EmailHandler
-
+import os
 load_dotenv('.env')
 
 class Account(BaseModel):
@@ -32,7 +31,6 @@ async def get_favicorn():
 
 @app.post("/tax-status")
 async def get_status(account: Account):
-    print(account.email)
     chrome_options = Options()
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--window-size=1920,1080")
