@@ -41,38 +41,43 @@ async def get_status(account: Account):
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920,1080")
     chrome_options.add_argument("--remote-debugging-port=9222")
-
+    screenshot_path = 'taxstatus.png'
     try:
         driver = webdriver.Chrome(options=chrome_options)
-        driver.get('https://sandbox.oxylabs.io/products')
+        driver.get('https://mytax.dc.gov/_/')
         driver.save_screenshot('screenshot.png')
 
         # Find the textbox by classname
-        textbox = driver.find_element(By.CLASS_NAME, 'egbpcqk1')
-
-        # Input text "Cloudth" into the textbox
-        textbox.send_keys("Tetris Effect: Connected")
-
-
-        # Find the image by classname
-        image = driver.find_element(By.CLASS_NAME, 'egbpcqk0')
-
-        # Click on the image
-        image.click()
+        link = driver.find_element(By.CSS_SELECTOR, '#l_Df-1-15 span.ColIconText')
+        link.click()
 
         time.sleep(3)
+        # Input text "Cloudth" into the textbox
+
+        textbox1 = driver.find_element(By.ID, '#Dc-a')
+        textbox1.send_keys(account.password)
+
+        textbox2 = driver.find_element(By.ID, '#Dc-8')
+        textbox2.send_keys(account.name)
+
+
+        button = driver.find_element(By.ID, '#Dc-c')
+        button.click()
+
+        time.sleep(5)
+
+        # Find the taxstatus by ID
+        taxstatus = driver.find_element(By.ID, '#caption2_Dc-j')
+        time.sleep(10)
 
         # Scroll down the page using JavaScript
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
-        driver.save_screenshot('screenshot.png')
-
-        # Find the element you want to capture (replace 'element_id' with the actual ID, class name, XPath, etc.)
-        element = driver.find_element(By.CLASS_NAME, 'e1kord973')
+        driver.save_screenshot(screenshot_path)
 
         # Get the location and size of the element
-        location = element.location_once_scrolled_into_view
-        size = element.size
+        location = taxstatus.location_once_scrolled_into_view
+        size = taxstatus.size
 
         # Take a screenshot of the element
         screenshot = driver.get_screenshot_as_png()
