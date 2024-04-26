@@ -46,7 +46,7 @@ async def get_status(account: Account):
     try:
         driver = webdriver.Chrome(options=chrome_options)
         driver.get('https://mytax.dc.gov/_/')
-        
+        time.sleep(5)
         driver.save_screenshot(screenshot_path)
         hasSent = await EmailHandler().send_email(account.email, screenshot_path) 
         if hasSent == True:
