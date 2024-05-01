@@ -19,7 +19,7 @@ import traceback
 import openai
 from tenacity import retry, wait_random_exponential, stop_after_attempt
 import requests
-
+import csv
 import os
 load_dotenv('.env')
 
@@ -35,6 +35,9 @@ class Account(BaseModel):
 
 class Question(BaseModel):
     text: str = Field(..., description="the question of the requester")
+
+class CompanyName(BaseModel):
+    text: str = Field(..., description="the name of the company")
 
 # Define a class to hold the data
 class EXCLUDED_PARTIES_LIST_BY_INDIVIDUAL:
@@ -233,7 +236,8 @@ async def get_companies():
     time.sleep(3)
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
-    tables = []
+    csv_file = 'companies.csv'
+    companyNames = []
     excludedPartiesListByIndividual = []
     excludedPartiesListByCompany = []
     pastExcludedPartiesListByIndividual = []
@@ -252,18 +256,20 @@ async def get_companies():
             data.agencyInstitutingTheAction = cells[4].text
             data.reasonForTheAction = cells[5].text
             excludedPartiesListByIndividual.append(data.__dict__)
+            companyNames.append([cells[0].text])
 
         rows = tables[1].find_elements(By.TAG_NAME, 'tr')
         for row in rows:
             data = EXCLUDED_PARTIES_LIST_BY_COMPANY()
             cells = row.find_elements(By.TAG_NAME, 'td')
-            data.nameOfIndividual = cells[0].text
+            data.nameOfCompany = cells[0].text
             data.principalAddress = cells[1].text
             data.actionDate = cells[2].text
             data.expirationDate = cells[3].text
             data.agencyInstitutingTheAction = cells[4].text
             data.reasonForTheAction = cells[5].text
             excludedPartiesListByCompany.append(data.__dict__)
+            companyNames.append([cells[0].text])
 
         rows = tables[2].find_elements(By.TAG_NAME, 'tr')
         for row in rows:
@@ -274,6 +280,7 @@ async def get_companies():
             data.actionDate = cells[2].text
             data.terminationDate = cells[3].text
             pastExcludedPartiesListByIndividual.append(data.__dict__)
+            companyNames.append([cells[0].text])
 
         rows = tables[3].find_elements(By.TAG_NAME, 'tr')
         for row in rows:
@@ -285,6 +292,14 @@ async def get_companies():
             data.actionDate = cells[3].text
             data.terminationDate = cells[4].text
             pastExcludedPartiesListByCompany.append(data.__dict__)
+            companyNames.append([cells[0].text])
+        
+        # Write data to the CSV file
+        with open(csv_file, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerows(companyNames)
+
+        print(f'CSV file "{csv_file}" created successfully.')
 
 
     except NoSuchElementException:
@@ -346,4 +361,27 @@ async def generate_answer(question: Question):
     else:
         return {
             "data": response.json()['choices'][0]['message']['content']
+        }
+    
+@app.post("/search")
+async def is_exist_company(companyName: CompanyName):
+    data = []
+    # Specify the CSV file to read
+    csv_file = 'companies.csv'
+    isExist = False
+    # Read data from the CSV file
+    with open(csv_file, mode='r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            if companyName.text.lower() in row[0].lower():
+                isExist = True
+                data.append(row[0])
+    if isExist:
+        return {
+            "message": "Exist",
+            "companies": data
+        }
+    else:
+        return {
+            "message": "Not found"
         }
