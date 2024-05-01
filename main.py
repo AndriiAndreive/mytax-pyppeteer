@@ -1,4 +1,5 @@
 import time
+import json
 import asyncio
 from fastapi import FastAPI
 from dotenv import load_dotenv
@@ -15,13 +16,59 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from email_handler import EmailHandler
 import traceback
+import openai
+from tenacity import retry, wait_random_exponential, stop_after_attempt
+import requests
+
 import os
 load_dotenv('.env')
+
+API_KEY = os.getenv('OPENAI_API_KEY')
+openai.api_key = API_KEY
+GPT_MODEL = os.getenv('GPT_MODEL')
+endpoint = 'https://api.openai.com/v1/chat/completions'
 
 class Account(BaseModel):
     # email: str = Field(..., description="recipient email")
     name: str = Field(..., description="mytax name")
     password: str = Field(..., description="mytax password")
+
+class Question(BaseModel):
+    text: str = Field(..., description="the question of the requester")
+
+# Define a class to hold the data
+class EXCLUDED_PARTIES_LIST_BY_INDIVIDUAL:
+    def __init__(self):
+        self.nameOfIndividual = None
+        self.principalAddress = None
+        self.actionDate = None
+        self.expirationDate = None
+        self.agencyInstitutingTheAction = None
+        self.reasonForTheAction = None
+
+class EXCLUDED_PARTIES_LIST_BY_COMPANY:
+    def __init__(self):
+        self.nameOfCompany = None
+        self.principalAddress = None
+        self.actionDate = None
+        self.expirationDate = None
+        self.agencyInstitutingTheAction = None
+        self.reasonForTheAction = None
+
+class PAST_EXCLUDED_PARTIES_LIST_BY_INDIVIDUAL:
+    def __init__(self):
+        self.nameOfIndividual = None
+        self.principalAddress = None
+        self.actionDate = None
+        self.terminationDate = None
+
+class PAST_EXCLUDED_PARTIES_LIST_BY_COMPANY:
+    def __init__(self):
+        self.nameOfCompany = None
+        self.principalAddress = None
+        self.principals = None
+        self.actionDate = None
+        self.terminationDate = None
 
 app = FastAPI()
 
@@ -30,8 +77,8 @@ async def root():
     return {"message": "Hello World"}
 
 @app.get("/favicon.ico")
-async def get_favicorn():
-    return {"message": "This is favicorn"}
+async def get_favicon():
+    return {"message": "This is favicon"}
 
 @app.post("/tax-status")
 async def get_status(account: Account):
@@ -162,3 +209,136 @@ async def get_status(account: Account):
     except:
         traceback.print_exc()
         return {"message": "An error occurred while loading the element"}
+    
+@app.get("/companies")
+async def get_companies():
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+
+    driver = webdriver.Chrome(options=chrome_options)
+    # Create a dictionary with the custom header
+    headers = {
+        "Origin": "*"
+    }
+
+    # Send the custom header using Chrome DevTools Protocol
+    driver.execute_cdp_cmd('Network.setExtraHTTPHeaders', {'headers': headers})
+
+    driver.get('https://ocp.dc.gov/page/excluded-parties-list')
+    time.sleep(3)
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
+    tables = []
+    excludedPartiesListByIndividual = []
+    excludedPartiesListByCompany = []
+    pastExcludedPartiesListByIndividual = []
+    pastExcludedPartiesListByCompany = []
+    try:
+        tables = driver.find_elements(By.CSS_SELECTOR, '#section-content table tbody')
+        
+        rows = tables[0].find_elements(By.TAG_NAME, 'tr')
+        for row in rows:
+            data = EXCLUDED_PARTIES_LIST_BY_INDIVIDUAL()
+            cells = row.find_elements(By.TAG_NAME, 'td')
+            data.nameOfIndividual = cells[0].text
+            data.principalAddress = cells[1].text
+            data.actionDate = cells[2].text
+            data.expirationDate = cells[3].text
+            data.agencyInstitutingTheAction = cells[4].text
+            data.reasonForTheAction = cells[5].text
+            excludedPartiesListByIndividual.append(data.__dict__)
+
+        rows = tables[1].find_elements(By.TAG_NAME, 'tr')
+        for row in rows:
+            data = EXCLUDED_PARTIES_LIST_BY_COMPANY()
+            cells = row.find_elements(By.TAG_NAME, 'td')
+            data.nameOfIndividual = cells[0].text
+            data.principalAddress = cells[1].text
+            data.actionDate = cells[2].text
+            data.expirationDate = cells[3].text
+            data.agencyInstitutingTheAction = cells[4].text
+            data.reasonForTheAction = cells[5].text
+            excludedPartiesListByCompany.append(data.__dict__)
+
+        rows = tables[2].find_elements(By.TAG_NAME, 'tr')
+        for row in rows:
+            data = PAST_EXCLUDED_PARTIES_LIST_BY_INDIVIDUAL()
+            cells = row.find_elements(By.TAG_NAME, 'td')
+            data.nameOfIndividual = cells[0].text
+            data.principalAddress = cells[1].text
+            data.actionDate = cells[2].text
+            data.terminationDate = cells[3].text
+            pastExcludedPartiesListByIndividual.append(data.__dict__)
+
+        rows = tables[3].find_elements(By.TAG_NAME, 'tr')
+        for row in rows:
+            data = PAST_EXCLUDED_PARTIES_LIST_BY_COMPANY()
+            cells = row.find_elements(By.TAG_NAME, 'td')
+            data.nameOfCompany = cells[0].text
+            data.principalAddress = cells[1].text
+            data.principals = cells[2].text
+            data.actionDate = cells[3].text
+            data.terminationDate = cells[4].text
+            pastExcludedPartiesListByCompany.append(data.__dict__)
+
+
+    except NoSuchElementException:
+        return {"message": "Unfortunately, we couldn't find table elements"}
+
+    return [
+        {
+            "title": "EXCLUDED PARTIES LIST BY INDIVIDUAL",
+            "data": excludedPartiesListByIndividual
+        },
+        {
+            "title": "EXCLUDED PARTIES LIST BY COMPANY",
+            "data": excludedPartiesListByCompany
+        },
+        {
+            "title": "PAST EXCLUDED PARTIES LIST BY INDIVIDUAL",
+            "data": pastExcludedPartiesListByIndividual
+        },
+        {
+            "title": "PAST EXCLUDED PARTIES LIST BY COMPANY",
+            "data": pastExcludedPartiesListByCompany
+        }
+    ]
+
+@retry(wait=wait_random_exponential(multiplier=1, max=40), stop=stop_after_attempt(3))
+def chat_completion_request(messages, model=GPT_MODEL):
+    json_data = {
+        "model": model,
+        "messages": messages,
+        "temperature": 0
+    }
+
+    #headers
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + API_KEY
+    }
+
+    try:
+        response = requests.post(endpoint, headers=headers, json=json_data)
+        return response
+    
+    except Exception as e:
+        print('Unable to generate ChatCompletion response')
+        print(f"Exception {e}")
+        return e
+
+@app.post("/generate")
+async def generate_answer(question: Question):
+
+    messages = []
+    messages.append({'role': 'system', 'content': 'You are a helpful assistant'})
+    messages.append({'role': 'user', 'content': question.text})
+
+    response = chat_completion_request(messages, GPT_MODEL)
+    
+    if 'error' in response.json():
+        return response.json()['error']
+    else:
+        return {
+            "data": response.json()['choices'][0]['message']['content']
+        }
