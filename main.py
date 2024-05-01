@@ -369,13 +369,20 @@ async def is_exist_company(companyName: CompanyName):
     # Specify the CSV file to read
     csv_file = 'companies.csv'
     isExist = False
-    # Read data from the CSV file
-    with open(csv_file, mode='r') as file:
-        reader = csv.reader(file)
-        for row in reader:
-            if companyName.text.lower() in row[0].lower():
-                isExist = True
-                data.append(row[0])
+
+    try:
+        # Read data from the CSV file
+        with open(csv_file, mode='r') as file:
+            reader = csv.reader(file)
+            for row in reader:
+                if companyName.text.lower() in row[0].lower():
+                    isExist = True
+                    data.append(row[0])
+    except Exception as e:
+        return {
+            "message": "Not found database file"
+        }
+    
     if isExist:
         return {
             "message": "Exist",
