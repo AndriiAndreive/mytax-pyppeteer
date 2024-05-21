@@ -380,7 +380,7 @@ async def is_exist_company(companyName: CompanyName):
                     data.append(row[0])
     except Exception as e:
         return {
-            "message": "Not found database file"
+            "message": "not found in the District's Excluded Parties List."
         }
     
     if isExist:
