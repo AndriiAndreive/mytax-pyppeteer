@@ -14,7 +14,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
-from email_handler import EmailHandler
+# from email_handler import EmailHandler
 import traceback
 import openai
 from tenacity import retry, wait_random_exponential, stop_after_attempt
@@ -299,9 +299,6 @@ async def get_companies():
             writer = csv.writer(file)
             writer.writerows(companyNames)
 
-        print(f'CSV file "{csv_file}" created successfully.')
-
-
     except NoSuchElementException:
         return {"message": "Unfortunately, we couldn't find table elements"}
 
@@ -332,7 +329,6 @@ def chat_completion_request(messages, model=GPT_MODEL):
         "temperature": 0
     }
 
-    #headers
     headers = {
         "Content-Type": "application/json",
         "Authorization": "Bearer " + API_KEY
@@ -394,62 +390,28 @@ async def is_exist_company(companyName: CompanyName):
         time.sleep(3)
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
-        csv_file = 'companies.csv'
         companyNames = []
-        excludedPartiesListByIndividual = []
-        excludedPartiesListByCompany = []
-        pastExcludedPartiesListByIndividual = []
-        pastExcludedPartiesListByCompany = []
         try:
             tables = driver.find_elements(By.CSS_SELECTOR, '#section-content table tbody')
             
             rows = tables[0].find_elements(By.TAG_NAME, 'tr')
             for row in rows:
-                data = EXCLUDED_PARTIES_LIST_BY_INDIVIDUAL()
                 cells = row.find_elements(By.TAG_NAME, 'td')
-                data.nameOfIndividual = cells[0].text
-                data.principalAddress = cells[1].text
-                data.actionDate = cells[2].text
-                data.expirationDate = cells[3].text
-                data.agencyInstitutingTheAction = cells[4].text
-                data.reasonForTheAction = cells[5].text
-                excludedPartiesListByIndividual.append(data.__dict__)
                 companyNames.append([cells[0].text])
 
             rows = tables[1].find_elements(By.TAG_NAME, 'tr')
             for row in rows:
-                data = EXCLUDED_PARTIES_LIST_BY_COMPANY()
                 cells = row.find_elements(By.TAG_NAME, 'td')
-                data.nameOfCompany = cells[0].text
-                data.principalAddress = cells[1].text
-                data.actionDate = cells[2].text
-                data.expirationDate = cells[3].text
-                data.agencyInstitutingTheAction = cells[4].text
-                data.reasonForTheAction = cells[5].text
-                excludedPartiesListByCompany.append(data.__dict__)
                 companyNames.append([cells[0].text])
 
             rows = tables[2].find_elements(By.TAG_NAME, 'tr')
             for row in rows:
-                data = PAST_EXCLUDED_PARTIES_LIST_BY_INDIVIDUAL()
                 cells = row.find_elements(By.TAG_NAME, 'td')
-                data.nameOfIndividual = cells[0].text
-                data.principalAddress = cells[1].text
-                data.actionDate = cells[2].text
-                data.terminationDate = cells[3].text
-                pastExcludedPartiesListByIndividual.append(data.__dict__)
                 companyNames.append([cells[0].text])
 
             rows = tables[3].find_elements(By.TAG_NAME, 'tr')
             for row in rows:
-                data = PAST_EXCLUDED_PARTIES_LIST_BY_COMPANY()
                 cells = row.find_elements(By.TAG_NAME, 'td')
-                data.nameOfCompany = cells[0].text
-                data.principalAddress = cells[1].text
-                data.principals = cells[2].text
-                data.actionDate = cells[3].text
-                data.terminationDate = cells[4].text
-                pastExcludedPartiesListByCompany.append(data.__dict__)
                 companyNames.append([cells[0].text])
             
             # Write data to the CSV file
@@ -457,6 +419,22 @@ async def is_exist_company(companyName: CompanyName):
                 writer = csv.writer(file)
                 writer.writerows(companyNames)
                 file.close()
+            
+            for element in companyNames:
+                if companyName.text.lower() in element:
+                    isExist = True
+                    data.append(row[0])
+                    break
+
+            if isExist:
+                return {
+                    "message": "Exist",
+                    "companies": data
+                }
+            else:
+                return {
+                    "message": "Not found"
+                }
 
         except NoSuchElementException:
             return {"message": "Unfortunately, we couldn't create csv file"}
