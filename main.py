@@ -473,7 +473,7 @@ async def is_exist_company(companyName: CompanyName):
 
     except Exception as e:
         return {
-            "message": "Not found database file"
+            "message": "not found"
         }
     
     if isExist:
