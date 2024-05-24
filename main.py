@@ -421,9 +421,9 @@ async def is_exist_company(companyName: CompanyName):
                 file.close()
             
             for element in companyNames:
-                if companyName.text.lower() in element:
+                if companyName.text.lower() in element.lower():
                     isExist = True
-                    data.append(row[0])
+                    data.append(element)
                     break
 
             if isExist:
