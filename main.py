@@ -370,6 +370,97 @@ async def is_exist_company(companyName: CompanyName):
     csv_file = 'companies.csv'
     isExist = False
 
+    if os.path.exists(csv_file):
+        pass
+    else:
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--window-size=1920,1080")
+        chrome_options.add_argument("--remote-debugging-port=9222")
+
+        driver = webdriver.Chrome(options=chrome_options)
+        # Create a dictionary with the custom header
+        headers = {
+            "Origin": "*"
+        }
+
+        # Send the custom header using Chrome DevTools Protocol
+        driver.execute_cdp_cmd('Network.setExtraHTTPHeaders', {'headers': headers})
+
+        driver.get('https://ocp.dc.gov/page/excluded-parties-list')
+        time.sleep(3)
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
+        csv_file = 'companies.csv'
+        companyNames = []
+        excludedPartiesListByIndividual = []
+        excludedPartiesListByCompany = []
+        pastExcludedPartiesListByIndividual = []
+        pastExcludedPartiesListByCompany = []
+        try:
+            tables = driver.find_elements(By.CSS_SELECTOR, '#section-content table tbody')
+            
+            rows = tables[0].find_elements(By.TAG_NAME, 'tr')
+            for row in rows:
+                data = EXCLUDED_PARTIES_LIST_BY_INDIVIDUAL()
+                cells = row.find_elements(By.TAG_NAME, 'td')
+                data.nameOfIndividual = cells[0].text
+                data.principalAddress = cells[1].text
+                data.actionDate = cells[2].text
+                data.expirationDate = cells[3].text
+                data.agencyInstitutingTheAction = cells[4].text
+                data.reasonForTheAction = cells[5].text
+                excludedPartiesListByIndividual.append(data.__dict__)
+                companyNames.append([cells[0].text])
+
+            rows = tables[1].find_elements(By.TAG_NAME, 'tr')
+            for row in rows:
+                data = EXCLUDED_PARTIES_LIST_BY_COMPANY()
+                cells = row.find_elements(By.TAG_NAME, 'td')
+                data.nameOfCompany = cells[0].text
+                data.principalAddress = cells[1].text
+                data.actionDate = cells[2].text
+                data.expirationDate = cells[3].text
+                data.agencyInstitutingTheAction = cells[4].text
+                data.reasonForTheAction = cells[5].text
+                excludedPartiesListByCompany.append(data.__dict__)
+                companyNames.append([cells[0].text])
+
+            rows = tables[2].find_elements(By.TAG_NAME, 'tr')
+            for row in rows:
+                data = PAST_EXCLUDED_PARTIES_LIST_BY_INDIVIDUAL()
+                cells = row.find_elements(By.TAG_NAME, 'td')
+                data.nameOfIndividual = cells[0].text
+                data.principalAddress = cells[1].text
+                data.actionDate = cells[2].text
+                data.terminationDate = cells[3].text
+                pastExcludedPartiesListByIndividual.append(data.__dict__)
+                companyNames.append([cells[0].text])
+
+            rows = tables[3].find_elements(By.TAG_NAME, 'tr')
+            for row in rows:
+                data = PAST_EXCLUDED_PARTIES_LIST_BY_COMPANY()
+                cells = row.find_elements(By.TAG_NAME, 'td')
+                data.nameOfCompany = cells[0].text
+                data.principalAddress = cells[1].text
+                data.principals = cells[2].text
+                data.actionDate = cells[3].text
+                data.terminationDate = cells[4].text
+                pastExcludedPartiesListByCompany.append(data.__dict__)
+                companyNames.append([cells[0].text])
+            
+            # Write data to the CSV file
+            with open(csv_file, mode='w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerows(companyNames)
+                file.close()
+
+        except NoSuchElementException:
+            return {"message": "Unfortunately, we couldn't create csv file"}
+
     try:
         # Read data from the CSV file
         with open(csv_file, mode='r') as file:
@@ -378,6 +469,8 @@ async def is_exist_company(companyName: CompanyName):
                 if companyName.text.lower() in row[0].lower():
                     isExist = True
                     data.append(row[0])
+            file.close()
+
     except Exception as e:
         return {
             "message": "Not found database file"
