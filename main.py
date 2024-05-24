@@ -419,12 +419,11 @@ async def is_exist_company(companyName: CompanyName):
                 writer = csv.writer(file)
                 writer.writerows(companyNames)
                 file.close()
-            
+
             for element in companyNames:
-                if companyName.text.lower() in str(element).lower():
+                if companyName.text.lower() in str(element[0]).lower():
                     isExist = True
-                    data.append([str(element)])
-                    break
+                    data.append(str(element[0]))
 
             if isExist:
                 return {
