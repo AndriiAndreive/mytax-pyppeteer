@@ -78,7 +78,7 @@ class EmailHandler:
             print('Connecting...')
             server = smtplib.SMTP(self.smtp_server, self.smtp_port)
             print('Connected...')
-            # server.starttls()  # Enable TLS encryption
+            server.starttls()  # Enable TLS encryption
             print('Logining...')
             server.login(self.smtp_username, self.smtp_password)
             print('Logged in')
