@@ -822,7 +822,7 @@ async def get_status(account: TaxAccount):
         # Recipient email and path to pdf
         subject = 'Certificate Document'
         pdf_title = 'Please check the attached PDF document to see tax payer status.'
-        hasSent = await EmailHandler().send_email(account.recipient_email, pdf_file_path, subject, pdf_title)
+        hasSent = await EmailHandler().send_email_with_pdf(account.recipient_email, pdf_file_path, subject, pdf_title)
         if hasSent == True:
             return {"message": "You has been sent the email successfully."}
         else:
@@ -905,7 +905,7 @@ async def get_companies(recipient: Recipient):
         # Recipient email and path to pdf
         subject = 'Excluded Parties List'
         pdf_title = 'Please check the attached PDF document to see excluded parties list.'
-        hasSent = await EmailHandler().send_email(recipient.email, pdf_file_path, subject, pdf_title) 
+        hasSent = await EmailHandler().send_email_with_pdf(recipient.email, pdf_file_path, subject, pdf_title) 
         if hasSent == True:
             return {"message": "You has been sent the email successfully."}
         else:
@@ -1056,7 +1056,7 @@ async def get_exclusions(account: SamGovAccount):
         # Recipient email and path to pdf
         subject = 'Exclusions'
         pdf_title = 'Please check the attached PDF document to see exclusions.'
-        hasSent = await EmailHandler().send_email(account.email, pdf_file_path, subject, pdf_title) 
+        hasSent = await EmailHandler().send_email_with_pdf(account.email, pdf_file_path, subject, pdf_title) 
         if hasSent == True:
             driver.quit()
             return {"message": "You has been sent the email successfully."}
