@@ -949,7 +949,7 @@ async def get_exclusions(account: SamGovAccount):
     driver.execute_cdp_cmd('Network.setExtraHTTPHeaders', {'headers': headers})
 
     driver.get('https://sam.gov/content/home')
-    time.sleep(5)
+    time.sleep(3)
 
     # Now simulate the 'Close Modal' button press
     closeModalButton = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="sds-dialog-0"]/button')))
@@ -960,12 +960,12 @@ async def get_exclusions(account: SamGovAccount):
         # Find login link on top coner
         loginLink = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="signIn"]/span')))
         loginLink.click()
-        time.sleep(3)
+        time.sleep(1)
 
         # Click agree button
         agreeButton = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="sds-dialog-1"]/ng-component/div[4]/button[2]')))
         agreeButton.click()
-        time.sleep(3)
+        time.sleep(1)
 
         # Scroll down the page using JavaScript
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -1006,7 +1006,7 @@ async def get_exclusions(account: SamGovAccount):
         submitButton = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="new_backup_code_verification_form"]/lg-submit-button/button')))
         submitButton.click()
         print("Clicked submit backup code button")
-        time.sleep(4)
+        time.sleep(2)
         
         # try:
         #     # Wait for the element to be visible
@@ -1024,7 +1024,7 @@ async def get_exclusions(account: SamGovAccount):
         print("Redirected to exclusions page")
 
         # Give it some time to load
-        time.sleep(4)
+        time.sleep(2)
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         print("Scroll down")
 
@@ -1048,7 +1048,7 @@ async def get_exclusions(account: SamGovAccount):
 
         downloadButton = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="sds-dialog-0"]/sds-formly-dialog/form/div[3]/button[2]')))
         downloadButton.click()
-        time.sleep(4)
+        time.sleep(2)
 
         pdf_file_path = 'report.pdf'
         # return {"message": "Downloaded a pdf file successfully!"}
