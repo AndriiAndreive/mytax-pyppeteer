@@ -817,6 +817,7 @@ async def get_status(account: TaxAccount):
         html_content = get_tax_content(account.tax_payer_id, account.notice_number, issuedTo)
         generate_pdf(html_content, pdf_file_path)
         print('Generated a pdf file successfully!')
+        return {"message": "Generated a pdf file successfully!"}
 
         # Recipient email and path to pdf
         subject = 'Certificate Document'
@@ -899,6 +900,7 @@ async def get_companies(recipient: Recipient):
         pdf_file_path = 'report.pdf'
         create_pdf_from_html(title, header, modified_html, pdf_file_path)
         print('Generated a pdf file successfully!')
+        return {"message": "Generated a pdf file successfully!"}
 
         # Recipient email and path to pdf
         subject = 'Excluded Parties List'
@@ -1049,6 +1051,7 @@ async def get_exclusions(account: SamGovAccount):
         time.sleep(4)
 
         pdf_file_path = 'report.pdf'
+        return {"message": "Downloaded a pdf file successfully!"}
 
         # Recipient email and path to pdf
         subject = 'Exclusions'
