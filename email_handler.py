@@ -1,6 +1,7 @@
 import os
 import smtplib
 from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
 from email.mime.image import MIMEImage
 from email.mime.text import MIMEText
 from dotenv import load_dotenv
@@ -51,6 +52,46 @@ class EmailHandler:
             print('Closing smtp server client...')
             server.quit()
             print('Closed!')
+            return True
+        
+        except Exception as e:
+            return False
+        
+    async def send_email_with_pdf(self, recipient_email: str, pdf_path: str, document_name: str, title: str):
+        os.chmod(pdf_path, 0o777)
+        # Set up email content
+        msg = MIMEMultipart()
+        msg['From'] = self.smtp_from
+        msg['To'] = recipient_email
+        msg['Subject'] = document_name
+        # Attach pdf
+        with open(pdf_path, 'rb') as f:
+            pdf = MIMEApplication(f.read(), _subtype='pdf')
+            pdf.add_header('Content-Disposition', 'attachment', filename='result.pdf')
+            msg.attach(pdf)
+
+        # Attach text message
+        text = MIMEText(title)
+        msg.attach(text)
+
+        try:
+            print('Connecting...')
+            server = smtplib.SMTP(self.smtp_server, self.smtp_port)
+            print('Connected...')
+            # server.starttls()  # Enable TLS encryption
+            print('Logining...')
+            server.login(self.smtp_username, self.smtp_password)
+            print('Logged in')
+            print('Sending')
+            server.send_message(msg)
+            print('Sent an email')
+            server.quit()
+
+            if os.path.exists(pdf_path):
+                os.remove(pdf_path)
+            else:
+                print("The file does not exist")
+
             return True
         
         except Exception as e:
