@@ -817,7 +817,7 @@ async def get_status(account: TaxAccount):
         html_content = get_tax_content(account.tax_payer_id, account.notice_number, issuedTo)
         generate_pdf(html_content, pdf_file_path)
         print('Generated a pdf file successfully!')
-        return {"message": "Generated a pdf file successfully!"}
+        # return {"message": "Generated a pdf file successfully!"}
 
         # Recipient email and path to pdf
         subject = 'Certificate Document'
@@ -900,7 +900,7 @@ async def get_companies(recipient: Recipient):
         pdf_file_path = 'report.pdf'
         create_pdf_from_html(title, header, modified_html, pdf_file_path)
         print('Generated a pdf file successfully!')
-        return {"message": "Generated a pdf file successfully!"}
+        # return {"message": "Generated a pdf file successfully!"}
 
         # Recipient email and path to pdf
         subject = 'Excluded Parties List'
@@ -1008,15 +1008,15 @@ async def get_exclusions(account: SamGovAccount):
         print("Clicked submit backup code button")
         time.sleep(4)
         
-        try:
-            # Wait for the element to be visible
-            validateMessage = WebDriverWait(driver, 2).until(EC.visibility_of_element_located((By.XPATH, '//*[starts-with(@id, "validated-field-error-")]')))
-            driver.quit()
-            # If we reach this point, the element was found
-            return {"message": validateMessage.text}
-        except (TimeoutException, NoSuchElementException) as e:
-            # Handle the case where the element was not found within the timeout
-            print("Element not found within the given time.")
+        # try:
+        #     # Wait for the element to be visible
+        #     validateMessage = WebDriverWait(driver, 2).until(EC.visibility_of_element_located((By.XPATH, '//*[starts-with(@id, "validated-field-error-")]')))
+        #     driver.quit()
+        #     # If we reach this point, the element was found
+        #     return {"message": validateMessage.text}
+        # except (TimeoutException, NoSuchElementException) as e:
+        #     # Handle the case where the element was not found within the timeout
+        #     print("Element not found within the given time.")
 
         # Navigate to the specific URL
         target_url = 'https://sam.gov/entities/view/G2DYNCVB75U9/exclusionInfo?status=Active&emrKeyValue=2519528~1724323876123673'
@@ -1051,7 +1051,7 @@ async def get_exclusions(account: SamGovAccount):
         time.sleep(4)
 
         pdf_file_path = 'report.pdf'
-        return {"message": "Downloaded a pdf file successfully!"}
+        # return {"message": "Downloaded a pdf file successfully!"}
 
         # Recipient email and path to pdf
         subject = 'Exclusions'
