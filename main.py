@@ -304,6 +304,7 @@ def get_tax_content(tax_payer_id: str, notice_number: str, issuedTo: str) -> str
                     <tr>
                         <td>Date of Notice: {current_date}<br /></td>
                         <td>Notice Number: {notice_number}<br /></td>
+                        <td rowspan="2"><img src="./assets/symbol.png" style="width: 30px; vertical-align: middle;" /></td>
                     </tr>
                     <tr>
                         <td>{issuedTo}<br />150 CLOVE RD STE 11<br />LITTLE FALLS NJ 07424-2140</td>
@@ -338,6 +339,9 @@ def get_tax_content(tax_payer_id: str, notice_number: str, issuedTo: str) -> str
                 <br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
                 <div style="padding: 30px">
                     <table style="margin: 30px">
+                        <tr>
+                            <td><img src="./assets/signature.png" width="210" /></td>
+                        </tr>
                         <tr>
                             <td><p>Authorized By Melinda Jenkins<br />Branch Chief, Collection and Enforcement Administration</p><br /><br /><br /></td>
                         </tr>
