@@ -212,7 +212,7 @@ def convert_image_to_rgba(image_path: str, output_path: str):
     img.save(output_path)
 
 def get_tax_content(tax_payer_id: str, notice_number: str, issuedTo: str) -> str:
-    # convert_image_to_rgba('./assets/OTRGray.png', './assets/OTRGray_rgba.png')
+    convert_image_to_rgba('./assets/OTRGray.png', './assets/OTRGray.png')
     current_date = datetime.datetime.now().strftime("%B %#d, %Y")
     html_content = f"""
         <html>
@@ -221,6 +221,10 @@ def get_tax_content(tax_payer_id: str, notice_number: str, issuedTo: str) -> str
                 @page {{
                     size: a4 portrait;
                     background-color: lightgray;
+                    background-image: url('./assets/OTRGray.png');
+                    background-object-position: 50px 350px;
+                    background-width: 700px;
+                    background-height: 349px;
                     @frame header_frame {{ /* Static Frame */
                         -pdf-frame-content: header_content;
                         left: 30pt; width: 532pt; top: 36pt; height: 70pt;
@@ -275,6 +279,9 @@ def get_tax_content(tax_payer_id: str, notice_number: str, issuedTo: str) -> str
                 #content_frame td {{
                     font-size: 11pt;
                 }}
+                #content_frame {{
+                    background: url('./assets/OTRGray.png')
+                }}
             </style>
         </head>
 
@@ -324,7 +331,6 @@ def get_tax_content(tax_payer_id: str, notice_number: str, issuedTo: str) -> str
                         </tr>
                         <tr>
                             <td>
-                                <br />
                                 <h3 style="text-align: center; margin-top: 30px; font-weight: initial;">
                                     TITLE 47. TAXATION, LICENSING, PERMITS, ASSESSMENTS, AND FEES<br />
                                     CHAPTER 28 GENERAL LICENSE<br />
@@ -336,7 +342,7 @@ def get_tax_content(tax_payer_id: str, notice_number: str, issuedTo: str) -> str
                         </tr>
                     </table>
                 </div>
-                <br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+                <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
                 <div style="padding: 30px">
                     <table style="margin: 30px">
                         <tr>
