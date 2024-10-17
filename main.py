@@ -223,8 +223,8 @@ def get_tax_content(tax_payer_id: str, notice_number: str, issuedTo: str) -> str
                     background-color: lightgray;
                     background-image: url('./assets/OTRGray.png');
                     background-object-position: 50px 300px;
-                    background-width: 680px;
-                    background-height: 400px;
+                    background-width: 700px;
+                    background-height: 485px;
                     @frame header_frame {{ /* Static Frame */
                         -pdf-frame-content: header_content;
                         left: 30pt; width: 532pt; top: 36pt; height: 70pt;
